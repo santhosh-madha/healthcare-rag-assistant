@@ -1,0 +1,3 @@
+At the fictional Cedar Learning Clinic, patients can book an appointment through the patient portal or by calling the reception desk.
+
+To cancel an appointment at the fictional Cedar Learning Clinic, use the cancellation option in the patient portal. The portal displays a cancellation confirmation.

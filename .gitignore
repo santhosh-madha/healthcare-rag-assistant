@@ -1,0 +1,10 @@
+__pycache__/
+*.pyc
+.venv/
+.env
+.DS_Store
+.cache/
+.env.*
+!.env.example
+data/raw/
+evaluation_runs/

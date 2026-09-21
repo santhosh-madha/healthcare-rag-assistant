@@ -1,0 +1,3 @@
+At the fictional Cedar Learning Clinic, patients can request a copy of their records through the patient portal. The records team reviews each request.
+
+To correct contact information at the fictional Cedar Learning Clinic, open the profile section of the patient portal and update the address or phone number.
