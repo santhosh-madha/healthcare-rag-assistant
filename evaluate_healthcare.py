@@ -61,7 +61,20 @@ def main():
     default=PROJECT / "cdc_evaluation_questions.json",
     help="Path to the evaluation question JSON file",
 )
+    parser.add_argument("--retriever", choices=("dense", "hybrid"), default="dense")
+    parser.add_argument("--prompt-variant", choices=("original", "atomic"), default="original")
+    parser.add_argument("--schema", action="store_true", help="Constrain structured generation with JSON Schema")
     args = parser.parse_args()
+    if args.schema and not args.structured:
+        parser.error("--schema requires --structured")
+    if args.prompt_variant != "original" and not args.structured:
+        parser.error("--prompt-variant atomic requires --structured")
+    retrieve_fn = search
+    retrieval_settings = {"method": "dense", "limit": 3}
+    if args.retriever == "hybrid":
+        from hybrid_search import search as retrieve_fn, K1, B, RRF_K, CANDIDATES
+        retrieval_settings = {"method": "hybrid", "limit": 3, "bm25_k1": K1,
+                              "bm25_b": B, "rrf_k": RRF_K, "candidates": CANDIDATES}
 
     mode = (
         "structured" if args.structured
@@ -69,6 +82,9 @@ def main():
         else "baseline"
     )
     prompt = STRUCTURED_PROMPT if args.structured else HEALTHCARE_PROMPT
+    if args.prompt_variant == "atomic":
+        from experimental_prompt import ATOMIC_PROMPT
+        prompt = ATOMIC_PROMPT
 
     raw_corpus = CHUNKS_FILE.read_bytes()
     corpus = json.loads(raw_corpus)
@@ -126,10 +142,13 @@ def main():
     report = {
         "created_at": now.isoformat(),
         "mode": mode,
+        "retriever": args.retriever,
+        "retrieval_settings": retrieval_settings,
         "embedding_model": MODEL_NAME,
         "generation_model": GENERATION_MODEL,
         "system_prompt": prompt,
-        "response_format": "json" if args.structured else None,
+        "prompt_variant": args.prompt_variant,
+        "response_format": "schema" if args.schema else ("json" if args.structured else None),
         "corpus_sha256": hashlib.sha256(raw_corpus).hexdigest(),
         "corpus": corpus,
         "test_set": test_set,
@@ -140,7 +159,7 @@ def main():
         print(f"\nRunning {test['id']}: {test['question']}", flush=True)
 
         with redirect_stdout(io.StringIO()):
-            results = search(
+            results = retrieve_fn(
                 model, index, passages, test["question"], limit=3
             )
 
@@ -152,13 +171,18 @@ def main():
         validation_error = None
         validation_passed = None
 
+        response_format = "json" if args.structured else None
+        if args.schema:
+            from structured_schema import response_schema
+            response_format = response_schema(len(results))
+
         if not args.retrieval_only:
             try:
                 raw_response = generate_answer(
                     test["question"],
                     context,
                     system_prompt=prompt,
-                    response_format="json" if args.structured else None,
+                    response_format=response_format,
                 )
             except RuntimeError as error:
                 generation_error = str(error)
@@ -185,6 +209,7 @@ def main():
                 any(evidence_hit(p, test["evidence"]) for p in results)
                 if test["answerable"] else None
             ),
+            "response_format_sent": response_format,
             "raw_response": raw_response,
             "structured_response": structured_response,
             "generation_error": generation_error,

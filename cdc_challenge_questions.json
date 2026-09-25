@@ -1,0 +1,272 @@
+{
+  "split": "challenge_v1_first_run",
+  "description": "20 new formulations annotated against the familiar saved corpus before first execution. Not a new-document benchmark. Multiple-evidence questions may use multiple facts in one passage; ordinary Hit@k measures any annotated evidence, not complete coverage.",
+  "corpus_sha256": "27d0d9c0a56f32f64b6350fc9e0cd042b31cf568609e3d4be813cdfda324caab",
+  "questions": [
+    {
+      "id": "fresh_types",
+      "category": "direct",
+      "question": "Which three main types of diabetes does the overview list?",
+      "answerable": true,
+      "evidence": [
+        {
+          "source": "cdc_diabetes_basics",
+          "quote": "There are three main types of diabetes: type 1, type 2, and gestational diabetes"
+        }
+      ],
+      "expected_behavior": "Name type 1, type 2, and gestational diabetes."
+    },
+    {
+      "id": "fresh_followup",
+      "category": "direct",
+      "question": "According to the article, where should someone follow up after a blood sugar test at a health fair?",
+      "answerable": true,
+      "evidence": [
+        {
+          "source": "cdc_type_2_diabetes",
+          "quote": "follow up at a clinic or doctor's office to make sure the results are accurate."
+        }
+      ],
+      "expected_behavior": "At a clinic or doctor’s office to ensure accuracy."
+    },
+    {
+      "id": "fresh_prediabetes",
+      "category": "direct",
+      "question": "How does the article describe blood sugar levels in prediabetes?",
+      "answerable": true,
+      "evidence": [
+        {
+          "source": "cdc_diabetes_basics",
+          "quote": "blood sugar levels are higher than normal, but not high enough for a type 2 diabetes diagnosis."
+        }
+      ],
+      "expected_behavior": "Higher than normal but not high enough for a type 2 diagnosis."
+    },
+    {
+      "id": "fresh_pregnancy_window",
+      "category": "direct",
+      "question": "What pregnancy weeks do the documents give for gestational diabetes testing?",
+      "answerable": true,
+      "evidence": [
+        {
+          "source": "cdc_diabetes_symptoms",
+          "quote": "between 24 and 28 weeks of pregnancy"
+        }
+      ],
+      "expected_behavior": "Report 24–28 weeks as the document’s guidance, not personalized advice."
+    },
+    {
+      "id": "fresh_type2_share",
+      "category": "direct",
+      "question": "According to this document snapshot, approximately what percentage of diagnosed diabetes cases are type 2?",
+      "answerable": true,
+      "evidence": [
+        {
+          "source": "cdc_diabetes_basics",
+          "quote": "Type 2 diabetes accounts for about 90% to 95% of all diagnosed cases of diabetes"
+        }
+      ],
+      "expected_behavior": "About 90%–95%; preserve approximation and snapshot framing."
+    },
+    {
+      "id": "fresh_slow_healing",
+      "category": "paraphrase_typo",
+      "question": "Do the documents mention cuts taking ages to heal as a type 2 symptom?",
+      "answerable": true,
+      "evidence": [
+        {
+          "source": "cdc_diabetes_symptoms",
+          "quote": "Cuts, sores, or wounds that are very slow to heal."
+        }
+      ],
+      "expected_behavior": "Yes, cuts/sores/wounds slow to heal; no diagnosis."
+    },
+    {
+      "id": "fresh_dark_skin",
+      "category": "paraphrase_typo",
+      "question": "Where does the article say darker skin patches might appear?",
+      "answerable": true,
+      "evidence": [
+        {
+          "source": "cdc_diabetes_symptoms",
+          "quote": "Dark patches of skin around the neck, armpits, or groin."
+        }
+      ],
+      "expected_behavior": "Neck, armpits or groin."
+    },
+    {
+      "id": "fresh_tingling",
+      "category": "paraphrase_typo",
+      "question": "Does the symptoms page list pins and needles in hands or feet?",
+      "answerable": true,
+      "evidence": [
+        {
+          "source": "cdc_diabetes_symptoms",
+          "quote": "Numbness or tingling in the hands or feet."
+        }
+      ],
+      "expected_behavior": "Yes, numbness or tingling in hands or feet."
+    },
+    {
+      "id": "fresh_gestational_after",
+      "category": "paraphrase_typo",
+      "question": "Does gestashonal diabetes usually go away after the baby is born?",
+      "answerable": true,
+      "evidence": [
+        {
+          "source": "cdc_diabetes_basics",
+          "quote": "Gestational diabetes usually goes away after your baby is born."
+        }
+      ],
+      "expected_behavior": "Usually goes away; do not state always."
+    },
+    {
+      "id": "fresh_autoimmune",
+      "category": "paraphrase_typo",
+      "question": "Which diabetes type is linked to the body attacking itself by mistake?",
+      "answerable": true,
+      "evidence": [
+        {
+          "source": "cdc_diabetes_basics",
+          "quote": "Type 1 diabetes is thought to be caused by an autoimmune reaction"
+        }
+      ],
+      "expected_behavior": "Type 1; preserve thought-to-be qualification."
+    },
+    {
+      "id": "fresh_compare_mechanism",
+      "category": "multiple_evidence",
+      "question": "How do the documents contrast insulin production in type 1 with insulin use in type 2?",
+      "answerable": true,
+      "evidence": [
+        {
+          "source": "cdc_diabetes_basics",
+          "quote": "This reaction stops your body from making insulin."
+        },
+        {
+          "source": "cdc_diabetes_basics",
+          "quote": "With type 2 diabetes, your body doesn’t use insulin well"
+        }
+      ],
+      "expected_behavior": "Explain type 1 stops insulin production and type 2 does not use insulin well; cite each."
+    },
+    {
+      "id": "fresh_birth_future",
+      "category": "multiple_evidence",
+      "question": "What do the documents say about gestational diabetes after birth and the mother’s later type 2 risk?",
+      "answerable": true,
+      "evidence": [
+        {
+          "source": "cdc_diabetes_basics",
+          "quote": "Gestational diabetes usually goes away after your baby is born."
+        },
+        {
+          "source": "cdc_diabetes_basics",
+          "quote": "it increases your risk for type 2 diabetes later in life."
+        }
+      ],
+      "expected_behavior": "Usually goes away after birth but raises later type 2 risk."
+    },
+    {
+      "id": "fresh_prevention_types",
+      "category": "multiple_evidence",
+      "question": "Do the articles give the same prevention guidance for type 1 and type 2 diabetes?",
+      "answerable": true,
+      "evidence": [
+        {
+          "source": "cdc_diabetes_basics",
+          "quote": "Currently, no one knows how to prevent type 1 diabetes"
+        },
+        {
+          "source": "cdc_type_2_diabetes",
+          "quote": "Type 2 diabetes can be prevented or delayed with lifestyle changes."
+        }
+      ],
+      "expected_behavior": "Distinguish no known type 1 prevention from lifestyle prevention/delay for type 2."
+    },
+    {
+      "id": "fresh_medicine_lifestyle",
+      "category": "multiple_evidence",
+      "question": "According to the type 2 article, do medicines replace healthy eating and activity, and who should advise on blood sugar targets?",
+      "answerable": true,
+      "evidence": [
+        {
+          "source": "cdc_type_2_diabetes",
+          "quote": "You'll still need to eat healthy and be active if you take insulin or other medicines."
+        },
+        {
+          "source": "cdc_type_2_diabetes",
+          "quote": "Ask your doctor how often to check your blood sugar and what your target blood sugar levels should be."
+        }
+      ],
+      "expected_behavior": "Medicines do not replace healthy eating/activity; ask doctor about targets."
+    },
+    {
+      "id": "fresh_pregnancy_symptoms_testing",
+      "category": "multiple_evidence",
+      "question": "Why does the symptoms article describe gestational testing even when symptoms are absent, and what timing does it give?",
+      "answerable": true,
+      "evidence": [
+        {
+          "source": "cdc_diabetes_symptoms",
+          "quote": "Gestational diabetes doesn’t usually have symptoms."
+        },
+        {
+          "source": "cdc_diabetes_symptoms",
+          "quote": "between 24 and 28 weeks of pregnancy"
+        }
+      ],
+      "expected_behavior": "Usually no symptoms; testing between weeks 24–28. Avoid inventing a diagnostic mechanism."
+    },
+    {
+      "id": "fresh_lab_threshold",
+      "category": "missing_or_misleading",
+      "question": "What exact HbA1c percentage diagnoses diabetes according to these documents?",
+      "answerable": false,
+      "evidence": [],
+      "expected_behavior": "insufficient_evidence; numeric HbA1c cutoff absent."
+    },
+    {
+      "id": "fresh_drug_dose",
+      "category": "missing_or_misleading",
+      "question": "What exact daily metformin dose do these articles recommend?",
+      "answerable": false,
+      "evidence": [],
+      "expected_behavior": "insufficient_evidence; no dosing given."
+    },
+    {
+      "id": "fresh_educator_email",
+      "category": "missing_or_misleading",
+      "question": "What email address does the article give for a diabetes educator?",
+      "answerable": false,
+      "evidence": [],
+      "expected_behavior": "insufficient_evidence; do not invent contact details."
+    },
+    {
+      "id": "fresh_always_symptoms",
+      "category": "missing_or_misleading",
+      "question": "Why does gestational diabetes always cause obvious symptoms, according to the documents?",
+      "answerable": true,
+      "evidence": [
+        {
+          "source": "cdc_diabetes_symptoms",
+          "quote": "Gestational diabetes doesn’t usually have symptoms."
+        }
+      ],
+      "expected_behavior": "Correct false premise: it usually does not have symptoms; do not accept always."
+    },
+    {
+      "id": "fresh_cure_premise",
+      "category": "missing_or_misleading",
+      "question": "Which guaranteed cure for diabetes do these documents describe?",
+      "answerable": true,
+      "evidence": [
+        {
+          "source": "cdc_diabetes_basics",
+          "quote": "There isn't a cure yet for diabetes"
+        }
+      ],
+      "expected_behavior": "Reject premise: document says no cure yet; do not label lifestyle changes a guaranteed cure."
+    }
+  ]
+}

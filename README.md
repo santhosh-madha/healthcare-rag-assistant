@@ -187,3 +187,62 @@ python review_answers.py evaluation_runs/reviews/YOUR_REPORT_review.json --summa
 ```
 
 Read the generated Markdown sheet alongside its JSON score file. Set `reviewer` to your name, then score correctness, evidence support, completeness, and refusal behavior using `pass`, `fail`, or `na`. Record failure categories and reasoning in `notes`; mark `completed` true only when finished. The sheet includes a rubric and the saved evidence; it does not call a model or assign scores. Summaries exclude unfinished reviews and report `na` separately. Original evaluation reports are preserved and generated review files stay in the ignored `evaluation_runs/reviews/` folder. Repeating creation refuses to overwrite your work. Review the document snapshot, not external medical assumptions; these judgments are not clinical validation.
+
+## Twenty-question challenge set
+
+`cdc_challenge_questions.json` contains five direct questions, five paraphrase/typo questions, five questions requiring multiple facts, and five missing-information/false-premise questions. Expected behavior and evidence were written before generation. Seventeen are answerable (including two false premises that the text can correct); three require abstention. The questions use the same familiar three-document snapshot and are not a new-document benchmark.
+
+```bash
+python evaluate_healthcare.py --structured --questions cdc_challenge_questions.json
+```
+
+Hit@k counts a match to any annotated evidence. For multiple-fact questions, inspect whether all required facts were retrieved and covered in the answer; one retrieval hit does not establish completeness. Preserve the first completed run before using this set to improve prompts or retrieval. Create review sheets from its saved report with `review_answers.py`.
+
+The first completed challenge run retrieved annotated evidence at rank one for 10/17 answerable questions and within three for 15/17. Generation completed for all 20; 17 passed mechanical validation and three failed it. Initial AI-assisted inspection found an unsupported claim despite matching quotes, incomplete answers following retrieval misses, and refusals on two correctable false premises. These are development findings, not an answer-accuracy score. A preceding sandbox connection failure was excluded from model-quality interpretation. The challenge set has now been inspected and should be treated as a regression set for further changes.
+
+## Experimental hybrid retrieval
+
+The default assistants still use dense MiniLM/FAISS search. `hybrid_search.py` experiments with combining it with BM25 exact-term search using reciprocal rank fusion (RRF). BM25 rewards distinctive matching words while adjusting for passage length and repeated terms; RRF combines the two ranked lists without treating their raw scores as comparable. Fixed settings: BM25 k1=1.5, b=0.75; top 10 candidates per method; RRF k=60; final top 3. No new dependencies or embeddings are needed. The lexical index is computed in memory per query for this small corpus.
+
+```bash
+python compare_retrieval.py cdc_challenge_questions.json cdc_evaluation_questions.json cdc_holdout_questions.json
+python evaluate_healthcare.py --structured --retriever hybrid --questions cdc_challenge_questions.json
+```
+
+The first comparison on inspected regression sets:
+
+| Set | Dense Hit@1 | Hybrid Hit@1 | Dense Hit@3 | Hybrid Hit@3 |
+|---|---:|---:|---:|---:|
+| Challenge | 10/17 | 15/17 | 15/17 | 17/17 |
+| Earlier development | 5/6 | 4/6 | 6/6 | 6/6 |
+| Previously held-out | 4/4 | 4/4 | 4/4 | 4/4 |
+
+Both original challenge misses moved to rank one, but one challenge comparison and one older paraphrase lost rank-one annotation hits. Matching every listed evidence excerpt within the top three improved from 14/17 to 16/17 on the challenge set. That stricter metric is still literal annotation coverage, not semantic completeness; on older sets, annotations may be alternative ways to support the same fact. A type 1/type 2 mechanism comparison still lacked complete annotated coverage.
+
+Hybrid results retain cosine scores separately from `fusion_score` and record dense/BM25 ranks. A lexical-only candidate has no cosine score (`null`); do not display its fusion score as cosine similarity or confidence. This experiment has not replaced the browser/CLI defaults. The comparison reports are local and ignored by Git.
+
+A targeted generation rerun of the two original retrieval misses, with unchanged prompt and corpus, produced two validated answers whose quotes supported the requested information on AI-assisted inspection. This is a two-case regression check, not a full hybrid answer evaluation or independent human review. Full generation regression is still required before promoting hybrid search to the default.
+
+## Opt-in generation experiment
+
+`experimental_prompt.py` adds instructions for one-source claims, correcting false premises, avoiding unsupported negative statements, and preserving qualifications. It is available only through an explicit evaluation option; the browser and terminal assistants retain the original prompt.
+
+```bash
+python evaluate_healthcare.py --structured --retriever hybrid --prompt-variant atomic --questions cdc_challenge_questions.json
+```
+
+Reports retain the complete prompt and variant name. Compare this with the original hybrid run using the same question set and retrieved contexts. More instructions do not guarantee better answers: requiring atomic claims can conflict with the two-claim limit on list questions. Keep unsuccessful experiments as regression evidence rather than silently adopting them.
+
+The first atomic-prompt run used the same 20 retrieved contexts as the original hybrid run. Validation passes fell from 19/20 to 17/20. AI-assisted inspection found one repaired count failure but new quote/count failures, lost source uncertainty, and a related-but-unresponsive answer to an unavailable email request. False-premise refusals persisted. The experiment is retained for reproducibility and is **not promoted to the default**. One run per prompt does not measure generation variability.
+
+## JSON-schema generation experiment
+
+Ollama accepts a JSON Schema object in its `format` field ([official documentation](https://docs.ollama.com/capabilities/structured-outputs)). This opt-in experiment uses the original prompt and hybrid retrieval:
+
+```bash
+python evaluate_healthcare.py --structured --retriever hybrid --schema --questions cdc_challenge_questions.json
+```
+
+`structured_schema.py` defines two response branches: answered with one or two claims, or insufficient evidence with no claims. Claim source labels are restricted to the retrieved IDs; required fields, strings, and allowed properties are specified. The exact schema sent is saved for each response in the report. The ordinary validator still checks the result, including quote matching. Constraints cannot establish factual support, appropriate refusals, or preservation of source qualifications. No automatic retry, prompt change, or increased output budget is part of this experiment. Browser and CLI defaults remain unchanged.
+
+The first schema run passed all 20 mechanical validations (original hybrid: 19/20) with unchanged prompt and retrieved contexts. AI-assisted inspection still found incomplete quote support, extra claims unrelated to the question, duplicate claims, and false-premise refusals. This demonstrates improved structural compliance in one run, **not 100% answer accuracy**. Historical runtime/model digests were not captured, so strict runtime equivalence cannot be established. The schema option remains experimental.
