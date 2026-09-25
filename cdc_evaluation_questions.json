@@ -1,0 +1,100 @@
+{
+  "split": "development",
+  "description": "Small development set, including previously explored questions. Not held out; evidence annotations may not list every acceptable passage.",
+  "questions": [
+    {
+      "id": "definition",
+      "category": "direct",
+      "question": "What is insulin resistance?",
+      "answerable": true,
+      "evidence": [
+        {
+          "source": "cdc_type_2_diabetes",
+          "quote": "cells don't respond normally to insulin"
+        }
+      ],
+      "expected_behavior": "Explain reduced cell response to insulin; cite evidence."
+    },
+    {
+      "id": "paraphrase",
+      "category": "paraphrase",
+      "question": "What does it mean when cells stop responding properly to insulin?",
+      "answerable": true,
+      "evidence": [
+        {
+          "source": "cdc_type_2_diabetes",
+          "quote": "cells don't respond normally to insulin"
+        }
+      ],
+      "expected_behavior": "Explain insulin resistance without adding unsupported mechanisms."
+    },
+    {
+      "id": "typo",
+      "category": "typo",
+      "question": "What is inslin resistence?",
+      "answerable": true,
+      "evidence": [
+        {
+          "source": "cdc_type_2_diabetes",
+          "quote": "cells don't respond normally to insulin"
+        }
+      ],
+      "expected_behavior": "Interpret the intended insulin-resistance question and cite evidence."
+    },
+    {
+      "id": "symptoms",
+      "category": "direct",
+      "question": "Can type 2 diabetes have no noticeable symptoms?",
+      "answerable": true,
+      "evidence": [
+        {
+          "source": "cdc_type_2_diabetes",
+          "quote": "Sometimes there aren't any noticeable symptoms at all"
+        }
+      ],
+      "expected_behavior": "Yes, sometimes; preserve the qualification and cite evidence."
+    },
+    {
+      "id": "age",
+      "category": "distinction",
+      "question": "Does type 2 diabetes occur only in adults?",
+      "answerable": true,
+      "evidence": [
+        {
+          "source": "cdc_type_2_diabetes",
+          "quote": "more and more children, teens , and young adults"
+        }
+      ],
+      "expected_behavior": "No; the source describes younger people developing it too. Cite evidence."
+    },
+    {
+      "id": "testing",
+      "category": "direct",
+      "question": "What kind of test can identify diabetes?",
+      "answerable": true,
+      "evidence": [
+        {
+          "source": "cdc_type_2_diabetes",
+          "quote": "A simple blood test"
+        }
+      ],
+      "expected_behavior": "Describe the blood test at the level supplied; do not invent thresholds or test names."
+    },
+    {
+      "id": "phone",
+      "category": "missing_information",
+      "question": "What is the phone number of Cedar Learning Clinic?",
+      "answerable": false,
+      "evidence": [],
+      "expected_behavior": "Acknowledge that the supplied documents do not provide the phone number."
+    },
+    {
+      "id": "hours",
+      "category": "missing_information",
+      "question": "What time does Cedar Learning Clinic close?",
+      "answerable": false,
+      "evidence": [],
+      "expected_behavior": "Acknowledge that clinic opening hours are absent."
+    }
+  ]
+}

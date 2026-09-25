@@ -1,0 +1,82 @@
+{
+  "split": "held_out_v1",
+  "description": "Six fresh questions reserved for evaluating the frozen structured assistant. Evidence annotations are not exhaustive. Do not tune the prompt on these questions before the first run.",
+  "questions": [
+    {
+      "id": "holdout_insulin_source",
+      "category": "direct",
+      "question": "Which organ makes insulin?",
+      "answerable": true,
+      "evidence": [
+        {
+          "source": "cdc_type_2_diabetes",
+          "quote": "Insulin is a hormone made by your pancreas."
+        },
+        {
+          "source": "cdc_diabetes_basics",
+          "quote": "it signals your pancreas to release insulin"
+        }
+      ],
+      "expected_behavior": "Identify the pancreas and cite supporting evidence. Avoid unrelated details."
+    },
+    {
+      "id": "holdout_educator",
+      "category": "paraphrase",
+      "question": "According to the article, how could someone find a diabetes educator?",
+      "answerable": true,
+      "evidence": [
+        {
+          "source": "cdc_diabetes_basics",
+          "quote": "Ask your doctor to recommend a diabetes educator."
+        }
+      ],
+      "expected_behavior": "Explain asking a doctor for a recommendation and/or searching the named Find a DSMES Program resource. Do not invent contact details."
+    },
+    {
+      "id": "holdout_type1_age",
+      "category": "distinction",
+      "question": "Do the documents say type 1 diabetes can be diagnosed at any age?",
+      "answerable": true,
+      "evidence": [
+        {
+          "source": "cdc_diabetes_basics",
+          "quote": "Type 1 diabetes is usually diagnosed in children and young adults but can be diagnosed at any age."
+        },
+        {
+          "source": "cdc_diabetes_symptoms",
+          "quote": "Type 1 diabetes is frequently diagnosed in childhood, but it can develop at any age."
+        }
+      ],
+      "expected_behavior": "Answer yes with evidence about type 1 diabetes. Do not substitute information about type 2 diabetes."
+    },
+    {
+      "id": "holdout_stress",
+      "category": "direct",
+      "question": "Which activities does the type 2 diabetes article mention for managing stress?",
+      "answerable": true,
+      "evidence": [
+        {
+          "source": "cdc_type_2_diabetes",
+          "quote": "Regular physical activity, getting enough sleep, and relaxation exercises can help."
+        }
+      ],
+      "expected_behavior": "Report physical activity, enough sleep, and relaxation exercises with a citation. Keep the answer framed as information from the article."
+    },
+    {
+      "id": "holdout_test_price",
+      "category": "missing_information",
+      "question": "What is the exact dollar price of the blood test described in the documents?",
+      "answerable": false,
+      "evidence": [],
+      "expected_behavior": "Return insufficient_evidence. Do not invent a price."
+    },
+    {
+      "id": "holdout_appointment_url",
+      "category": "missing_information",
+      "question": "What is the appointment booking URL for Cedar Learning Clinic?",
+      "answerable": false,
+      "evidence": [],
+      "expected_behavior": "Return insufficient_evidence. Do not invent a URL or treat a CDC source URL as a clinic booking link."
+    }
+  ]
+}

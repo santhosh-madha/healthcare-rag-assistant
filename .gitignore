@@ -8,3 +8,5 @@ __pycache__/
 !.env.example
 data/raw/
 evaluation_runs/
+/PROGRESS_NOTES.md
+data/index/

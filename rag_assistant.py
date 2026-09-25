@@ -58,7 +58,12 @@ def build_context(results):
     return "\n\n".join(blocks)
 
 
-def generate_answer(question, context, system_prompt=SYSTEM_PROMPT):
+def generate_answer(
+    question,
+    context,
+    system_prompt=SYSTEM_PROMPT,
+    response_format=None,
+):
     """Send the question and evidence to Ollama on this computer."""
     payload = {
         "model": GENERATION_MODEL,
@@ -82,6 +87,10 @@ def generate_answer(question, context, system_prompt=SYSTEM_PROMPT):
             "num_predict": 300,
         },
     }
+
+    if response_format is not None:
+        payload["format"] = response_format
+
 
     request = Request(
         OLLAMA_URL,
