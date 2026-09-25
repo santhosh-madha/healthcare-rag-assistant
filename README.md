@@ -176,3 +176,14 @@ Open http://127.0.0.1:8000 in your browser. Build the saved index first with `py
 The page provides example questions, validated answers, evidence quotes, source links, and expandable retrieved passages. Failed validation withholds the answer; generation failures show a retry message. Previous answers clear when a new request starts. Each question is independent. The embedding model and index load once at startup; restart after rebuilding the index.
 
 `web_assistant.py` handles local HTTP requests and calls the existing retrieval, Ollama, and validation functions. `web/index.html` contains the browser layout and request/rendering code. Model content is rendered as plain text. The server binds only to loopback and processes one request at a time; it is a local learning demo, not a public deployment server. It does not save question history. Retrieval debug text is printed in the server terminal.
+
+## Human answer review
+
+Create a local evidence sheet and editable score file from a saved generation report:
+
+```bash
+python review_answers.py evaluation_runs/YOUR_REPORT.json
+python review_answers.py evaluation_runs/reviews/YOUR_REPORT_review.json --summary
+```
+
+Read the generated Markdown sheet alongside its JSON score file. Set `reviewer` to your name, then score correctness, evidence support, completeness, and refusal behavior using `pass`, `fail`, or `na`. Record failure categories and reasoning in `notes`; mark `completed` true only when finished. The sheet includes a rubric and the saved evidence; it does not call a model or assign scores. Summaries exclude unfinished reviews and report `na` separately. Original evaluation reports are preserved and generated review files stay in the ignored `evaluation_runs/reviews/` folder. Repeating creation refuses to overwrite your work. Review the document snapshot, not external medical assumptions; these judgments are not clinical validation.
