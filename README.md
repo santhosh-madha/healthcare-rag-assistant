@@ -1,8 +1,14 @@
 # Healthcare RAG Assistant
 
-A local educational RAG application that answers questions from a saved CDC diabetes collection and displays evidence quotes and source links. Built with Python, Sentence Transformers, FAISS, and Llama 3.1 through Ollama.
+A local educational RAG application that answers questions from saved CDC and MedQuAD collections and displays evidence quotes and source links. Built with Python, Sentence Transformers, FAISS, and Llama 3.1 through Ollama.
 
-The included collection contains **3 documents and 20 chunks**. This project demonstrates document ingestion, retrieval, structured generation, and citation checks. It is not a clinically validated system or a tool for personal diagnosis or treatment.
+The included CDC collection contains **3 documents and 20 chunks**. The reproducible MedQuAD import adds **500 answer records from 481 documents, split into 1,020 chunks**. This project demonstrates document ingestion, retrieval, structured generation, and citation checks. It is not a clinically validated system or a tool for personal diagnosis or treatment.
+
+## Demo
+
+![MedQuAD answer with cited evidence](docs/images/medquad-answer.png)
+
+[Three-minute demo guide and screenshots](docs/demo.md) · [Detailed architecture](docs/architecture.md) · [End-to-end results](docs/medquad-smoke-check.md)
 
 ## Run locally
 

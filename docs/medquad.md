@@ -43,3 +43,7 @@ Timing includes question embedding, BM25 computation, and fusion, but excludes m
 [MedQuAD](https://github.com/abachaa/MedQuAD) by Asma Ben Abacha and Dina Demner-Fushman is distributed under [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/). Its license is copied into each imported snapshot. Cite: *A Question-Entailment Approach to Question Answering*, BMC Bioinformatics (2019), [DOI](https://doi.org/10.1186/s12859-019-3119-4).
 
 This project changes the data through XML extraction, whitespace normalization, deduplication, sampling, and chunking. Neither the dataset authors nor the original institutions endorse this project. The historical dataset is used for an educational retrieval demonstration.
+
+## End-to-end check
+
+See [the ten-question smoke check](medquad-smoke-check.md) for generation, quote validation, timing, and evidence-inspection results.
