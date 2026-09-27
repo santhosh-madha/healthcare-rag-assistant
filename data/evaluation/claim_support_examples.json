@@ -1,0 +1,158 @@
+{
+  "schema_version": 1,
+  "purpose": "Claim-to-quote support development examples; not a clinical benchmark.",
+  "label_provenance": "AI-assisted by Codex; pending human review. Previous user reviews do not apply.",
+  "corpus_sha256": "27d0d9c0a56f32f64b6350fc9e0cd042b31cf568609e3d4be813cdfda324caab",
+  "rubric": {
+    "supported": "The quote supports every factual proposition with its qualifiers.",
+    "partially_supported": "A multi-part claim contains at least one supported proposition and at least one unsupported proposition.",
+    "unsupported": "The quote does not establish the claim as written, including a single proposition with overstated certainty or scope."
+  },
+  "context_policy": "Judge cited quote, not truth from outside knowledge. The full passage may resolve pronouns/headings, but may not supply missing substantive evidence. Quote matching is a separate mechanical check.",
+  "examples": [
+    {
+      "id": "definition_supported",
+      "claim": "Insulin resistance means cells don't respond normally to insulin.",
+      "quote": "If you have type 2 diabetes, cells don't respond normally to insulin. This is called insulin resistance .",
+      "source": "cdc_type_2_diabetes",
+      "chunk_id": "cdc_type_2_diabetes:chunk-005",
+      "source_url": "https://www.cdc.gov/diabetes/about/about-type-2-diabetes.html",
+      "expected_label": "supported",
+      "rationale": "The quote explicitly names the condition and gives the same definition.",
+      "origin": "constructed contrast example",
+      "label_provenance": "AI-assisted by Codex; not human-verified"
+    },
+    {
+      "id": "prediabetes_supported",
+      "claim": "With prediabetes, blood sugar is above normal but below the level for a type 2 diagnosis.",
+      "quote": "With prediabetes , blood sugar levels are higher than normal, but not high enough for a type 2 diabetes diagnosis.",
+      "source": "cdc_diabetes_basics",
+      "chunk_id": "cdc_diabetes_basics:chunk-006",
+      "source_url": "https://www.cdc.gov/diabetes/about/index.html",
+      "expected_label": "supported",
+      "rationale": "Both comparisons in the claim are explicit in the quote.",
+      "origin": "constructed contrast example",
+      "label_provenance": "AI-assisted by Codex; not human-verified"
+    },
+    {
+      "id": "targets_supported",
+      "claim": "The article says to ask your doctor about blood sugar targets.",
+      "quote": "Ask your doctor how often to check your blood sugar and what your target blood sugar levels should be.",
+      "source": "cdc_type_2_diabetes",
+      "chunk_id": "cdc_type_2_diabetes:chunk-007",
+      "source_url": "https://www.cdc.gov/diabetes/about/about-type-2-diabetes.html",
+      "expected_label": "supported",
+      "rationale": "The quote explicitly identifies the doctor and target levels.",
+      "origin": "constructed contrast example",
+      "label_provenance": "AI-assisted by Codex; not human-verified"
+    },
+    {
+      "id": "birth_supported",
+      "claim": "Gestational diabetes usually goes away after birth.",
+      "quote": "Gestational diabetes usually goes away after your baby is born.",
+      "source": "cdc_diabetes_basics",
+      "chunk_id": "cdc_diabetes_basics:chunk-005",
+      "source_url": "https://www.cdc.gov/diabetes/about/index.html",
+      "expected_label": "supported",
+      "rationale": "The claim preserves usually and the timing.",
+      "origin": "constructed contrast example",
+      "label_provenance": "AI-assisted by Codex; not human-verified"
+    },
+    {
+      "id": "birth_partial",
+      "claim": "Gestational diabetes usually goes away after birth and increases the mother's later type 2 risk.",
+      "quote": "However, it increases your risk for type 2 diabetes later in life.",
+      "source": "cdc_diabetes_basics",
+      "chunk_id": "cdc_diabetes_basics:chunk-005",
+      "source_url": "https://www.cdc.gov/diabetes/about/index.html",
+      "expected_label": "partially_supported",
+      "rationale": "With the passage resolving it to gestational diabetes, the quote supports later risk but not the after-birth statement. A neighboring sentence cannot repair an incomplete cited quote.",
+      "origin": "adapted from schema-run birth/future-risk failure",
+      "label_provenance": "AI-assisted by Codex; not human-verified"
+    },
+    {
+      "id": "comparison_partial",
+      "claim": "In type 1 the body stops making insulin, while in type 2 cells don't respond normally to insulin.",
+      "quote": "Type 1 diabetes is thought to be caused by an autoimmune reaction (the body attacks itself by mistake). This reaction stops your body from making insulin.",
+      "source": "cdc_diabetes_basics",
+      "chunk_id": "cdc_diabetes_basics:chunk-004",
+      "source_url": "https://www.cdc.gov/diabetes/about/index.html",
+      "expected_label": "partially_supported",
+      "rationale": "The quote supports the type 1 part but supplies no type 2 comparison.",
+      "origin": "adapted from hybrid mechanism-comparison failure",
+      "label_provenance": "AI-assisted by Codex; not human-verified"
+    },
+    {
+      "id": "definition_plus_partial",
+      "claim": "Insulin resistance means cells don't respond normally to insulin, and a blood test costs 25 dollars.",
+      "quote": "If you have type 2 diabetes, cells don't respond normally to insulin. This is called insulin resistance .",
+      "source": "cdc_type_2_diabetes",
+      "chunk_id": "cdc_type_2_diabetes:chunk-005",
+      "source_url": "https://www.cdc.gov/diabetes/about/about-type-2-diabetes.html",
+      "expected_label": "partially_supported",
+      "rationale": "The definition is supported; the price is not supplied.",
+      "origin": "constructed contrast example",
+      "label_provenance": "AI-assisted by Codex; not human-verified"
+    },
+    {
+      "id": "targets_plus_partial",
+      "claim": "Ask your doctor about blood sugar targets and check your levels exactly four times daily.",
+      "quote": "Ask your doctor how often to check your blood sugar and what your target blood sugar levels should be.",
+      "source": "cdc_type_2_diabetes",
+      "chunk_id": "cdc_type_2_diabetes:chunk-007",
+      "source_url": "https://www.cdc.gov/diabetes/about/about-type-2-diabetes.html",
+      "expected_label": "partially_supported",
+      "rationale": "The doctor/targets part is supported; a fixed checking frequency is not.",
+      "origin": "constructed contrast example",
+      "label_provenance": "AI-assisted by Codex; not human-verified"
+    },
+    {
+      "id": "targets_unsupported",
+      "claim": "Your doctor should advise on blood sugar targets.",
+      "quote": "Get diabetes self-management education and support.",
+      "source": "cdc_diabetes_basics",
+      "chunk_id": "cdc_diabetes_basics:chunk-002",
+      "source_url": "https://www.cdc.gov/diabetes/about/index.html",
+      "expected_label": "unsupported",
+      "rationale": "This quote mentions education/support, not a doctor or target-setting. Other passages containing the answer do not make this quote sufficient.",
+      "origin": "adapted from dense medicine/targets failure",
+      "label_provenance": "AI-assisted by Codex; not human-verified"
+    },
+    {
+      "id": "omission_unsupported",
+      "claim": "Type 1 diabetes cannot involve tingling in the hands or feet.",
+      "quote": "People with type 1 diabetes may also have these symptoms: - Nausea. - Vomiting. - Stomach pains. - Diabetic ketoacidosis (DKA).",
+      "source": "cdc_diabetes_symptoms",
+      "chunk_id": "cdc_diabetes_symptoms:chunk-002",
+      "source_url": "https://www.cdc.gov/diabetes/signs-symptoms/index.html",
+      "expected_label": "unsupported",
+      "rationale": "A non-exhaustive list cannot establish that an unlisted symptom is impossible. This is an entailment judgment, not a medical claim about actual symptoms.",
+      "origin": "constructed contrast example",
+      "label_provenance": "AI-assisted by Codex; not human-verified"
+    },
+    {
+      "id": "always_unsupported",
+      "claim": "Gestational diabetes always goes away after birth.",
+      "quote": "Gestational diabetes usually goes away after your baby is born.",
+      "source": "cdc_diabetes_basics",
+      "chunk_id": "cdc_diabetes_basics:chunk-005",
+      "source_url": "https://www.cdc.gov/diabetes/about/index.html",
+      "expected_label": "unsupported",
+      "rationale": "Usually does not establish always. This single proposition strengthens the qualifier and is unsupported as written.",
+      "origin": "constructed contrast example",
+      "label_provenance": "AI-assisted by Codex; not human-verified"
+    },
+    {
+      "id": "certain_cause_unsupported",
+      "claim": "Type 1 diabetes is definitely caused by an autoimmune reaction.",
+      "quote": "Type 1 diabetes is thought to be caused by an autoimmune reaction (the body attacks itself by mistake).",
+      "source": "cdc_diabetes_basics",
+      "chunk_id": "cdc_diabetes_basics:chunk-004",
+      "source_url": "https://www.cdc.gov/diabetes/about/index.html",
+      "expected_label": "unsupported",
+      "rationale": "Thought to be does not support definite causation. The single strengthened proposition is unsupported as written.",
+      "origin": "adapted from atomic-prompt uncertainty failure",
+      "label_provenance": "AI-assisted by Codex; not human-verified"
+    }
+  ]
+}

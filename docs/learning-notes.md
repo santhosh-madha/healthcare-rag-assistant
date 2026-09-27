@@ -13,7 +13,7 @@ It returns original passages and their source locations. It does not generate an
 From this project folder, using Python 3.10 or newer:
 
 ```sh
-python3 retrieve.py "How do I cancel an appointment?"
+python3 -m healthcare_rag.retrieve "How do I cancel an appointment?"
 ```
 
 ## How it works
@@ -32,9 +32,9 @@ The future RAG pipeline is: **question → retrieval → passages plus question 
 Run these questions and inspect both the ranking and the source text:
 
 ```sh
-python3 retrieve.py "How do I cancel an appointment?"
-python3 retrieve.py "How do I call off a booking?"
-python3 retrieve.py "Where is the parking garage?"
+python3 -m healthcare_rag.retrieve "How do I cancel an appointment?"
+python3 -m healthcare_rag.retrieve "How do I call off a booking?"
+python3 -m healthcare_rag.retrieve "Where is the parking garage?"
 ```
 
 The first two questions have similar meanings, but our search cannot recognize synonyms. The parking question asks about something absent from the collection. Notice that missing evidence and different wording can both produce no results.
@@ -62,7 +62,7 @@ Activate your environment and install the dependencies if needed:
 ```sh
 source .venv/bin/activate
 python -m pip install -r requirements.txt
-python semantic_search.py "How to call off my booking?"
+python -m healthcare_rag.semantic_search "How to call off my booking?"
 ```
 
 The first run downloads `sentence-transformers/all-MiniLM-L6-v2` into `.cache/models`. Model inference then runs on your CPU; it does not require an API key. The model cache is excluded from Git. `requirements-lock.txt` records the full package versions installed during development on this Mac with Python 3.14; other platforms may need different versions.
@@ -80,10 +80,10 @@ These numbers are learned representations, not human-written categories. Higher 
 ### Compare the approaches
 
 ```sh
-python retrieve.py "How to call off my booking?"
-python semantic_search.py "How to call off my booking?"
-python semantic_search.py "How do I cancel an appointment?"
-python semantic_search.py "Where is the parking garage?"
+python -m healthcare_rag.retrieve "How to call off my booking?"
+python -m healthcare_rag.semantic_search "How to call off my booking?"
+python -m healthcare_rag.semantic_search "How do I cancel an appointment?"
+python -m healthcare_rag.semantic_search "Where is the parking garage?"
 ```
 
 Inspect whether the cancellation passage ranks first for both appointment questions. Then inspect the parking results: none of our documents describes parking, but nearest-neighbor search still returns passages. Retrieving the closest passage does not establish that an answer exists. We have not added an evidence check or a calibrated rejection threshold yet.
