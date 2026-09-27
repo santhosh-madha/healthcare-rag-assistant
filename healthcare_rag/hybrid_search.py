@@ -1,4 +1,4 @@
-"""Experimental BM25 + dense retrieval using reciprocal rank fusion."""
+"""BM25 + dense retrieval using reciprocal rank fusion."""
 import math
 import re
 from collections import Counter
@@ -63,4 +63,9 @@ def search(model, index, passages, question, limit=3):
     if not question.strip() or not passages or limit <= 0:
         return []
     dense = dense_search(model, index, passages, question, limit=CANDIDATES)
-    return fuse(dense, passages, bm25_scores(passages, question), limit)
+    results = fuse(dense, passages, bm25_scores(passages, question), limit)
+    print("\n--- Final hybrid ranking (not confidence) ---")
+    for rank, result in enumerate(results, 1):
+        print(f"{rank}. {result['chunk_id']} | RRF: {result['fusion_score']:.5f} "
+              f"| semantic rank: {result['dense_rank']} | keyword rank: {result['bm25_rank']}")
+    return results

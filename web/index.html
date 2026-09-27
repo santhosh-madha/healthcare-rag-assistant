@@ -8,11 +8,14 @@
 </style>
 </head>
 <body><main>
-<div class="eyebrow">LOCAL DOCUMENT RESEARCH · CDC DIABETES SNAPSHOT</div>
+<div class="eyebrow">LOCAL DOCUMENT RESEARCH</div>
 <h1>Healthcare Knowledge Assistant</h1>
 <p class="muted">Explore the documents. See the evidence behind each answer.</p>
 <p><small>Educational use only. This assistant does not provide personal diagnosis or treatment advice.</small></p>
 <section class="card"><form id="form">
+<label for="collection">Document collection</label>
+<select id="collection" style="font:inherit;padding:10px;margin-bottom:18px" disabled><option>Loading collections…</option></select>
+<p id="collection-note" class="muted"></p>
 <label for="question">What would you like to understand?</label>
 <textarea id="question" maxlength="2000" required placeholder="What is insulin resistance?"></textarea>
 <div class="examples"><button type="button">What is insulin resistance?</button><button type="button">Can type 2 diabetes have no noticeable symptoms?</button><button type="button">What is the exact price of a diabetes blood test?</button></div>
@@ -24,23 +27,37 @@
 </main>
 <script>
 const form=document.querySelector('#form'),question=document.querySelector('#question'),status=document.querySelector('#status'),result=document.querySelector('#result'),submit=document.querySelector('#submit');
+const collection=document.querySelector('#collection');
 function element(tag,text,parent){const node=document.createElement(tag);node.textContent=text;parent.append(node);return node;}
 function sourceLink(source,parent){try{const url=new URL(source.source_url);if(url.protocol==='https:'||url.protocol==='http:'){const a=element('a','Read original source ↗',parent);a.href=url.href;a.target='_blank';a.rel='noopener noreferrer';}}catch{}}
-document.querySelectorAll('.examples button').forEach(button=>button.addEventListener('click',()=>{question.value=button.textContent;question.focus();}));
+const examples={cdc:['What is insulin resistance?','Can type 2 diabetes have no noticeable symptoms?'],medquad:['What are the symptoms of Adult Acute Myeloid Leukemia?','What is the exact price of a medical appointment?']};
+function changeCollection(){
+ result.hidden=true;result.replaceChildren();status.textContent='';question.value='';
+ const box=document.querySelector('.examples');box.replaceChildren();
+ examples[collection.value].forEach(text=>{const button=element('button',text,box);button.type='button';button.onclick=()=>{question.value=text;question.focus();};});
+ question.placeholder=examples[collection.value][0];
+ document.querySelector('#collection-note').textContent=collection.value==='medquad'?'Historical MedQuAD snapshot. Original source links may have changed.':'Saved CDC diabetes documents.';
+}
+collection.addEventListener('change',changeCollection);
+submit.disabled=true;
+fetch('/collections').then(response=>{if(!response.ok)throw new Error('Could not load collections.');return response.json();}).then(items=>{
+ collection.replaceChildren();items.forEach(item=>{const option=element('option',item.label+' ('+item.chunks+' passages)',collection);option.value=item.id;});
+ collection.disabled=false;submit.disabled=false;changeCollection();
+}).catch(error=>{status.textContent=error.message;});
 form.addEventListener('submit',async event=>{
  event.preventDefault();const text=question.value.trim();if(!text){status.textContent='Enter a question first.';return;}
- submit.disabled=true;result.hidden=true;result.replaceChildren();status.className='';status.textContent='Finding evidence and generating an answer…';
+ submit.disabled=true;collection.disabled=true;result.hidden=true;result.replaceChildren();status.className='';status.textContent='Finding evidence and generating an answer…';
  try{
-  const response=await fetch('/ask',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({question:text})});
+  const response=await fetch('/ask',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({question:text,collection:collection.value})});
   const data=await response.json();if(!response.ok)throw new Error(data.error||'The request failed.');
-  element('h2','Your question',result);element('p',text,result);
+  element('small',collection.selectedOptions[0].textContent,result);element('h2','Your question',result);element('p',text,result);
   if(data.response.status==='insufficient_evidence'){element('h2','No answer provided',result);element('p','The model declined to answer from these passages. Review the retrieved evidence below; this does not prove the answer is absent.',result);}
   else{element('h2','Answer & evidence',result);data.response.claims.forEach(claim=>{const source=data.sources[Number(claim.source.slice(1))-1];element('p',claim.text+' ['+claim.source+']',result);element('blockquote',claim.quote,result);element('small',source.title+' — '+source.section_heading+' · ',result);sourceLink(source,result);});element('p','Source IDs and quote matches passed. Whether each quote supports its claim still requires review.',result).className='muted';}
   const details=element('details','',result);element('summary','Explore retrieved passages ('+data.sources.length+')',details);
-  element('p','Similarity measures closeness to your question, not confidence or factual accuracy.',details).className='muted';
-  data.sources.forEach((source,i)=>{const box=element('div','',details);box.className='source';element('h3','[S'+(i+1)+'] '+source.title+' — '+source.section_heading,box);element('small','Similarity: '+source.score.toFixed(3)+' · Source reviewed: '+(source.source_reviewed_date||'Not provided'),box);element('p',source.text,box);sourceLink(source,box);});
+  element('p','Hybrid ranking combines semantic and keyword search. Rank score and cosine similarity are different measures; neither is confidence or factual accuracy.',details).className='muted';
+  data.sources.forEach((source,i)=>{const box=element('div','',details);box.className='source';element('h3','[S'+(i+1)+'] '+source.title+' — '+source.section_heading,box);element('small','Hybrid rank score: '+source.fusion_score.toFixed(5)+' · Cosine similarity: '+(Number.isFinite(source.score)?source.score.toFixed(3):'not available (keyword candidate)')+' · Source reviewed: '+(source.source_reviewed_date||'Not provided'),box);element('p',source.text,box);sourceLink(source,box);});
   result.hidden=false;status.textContent='Complete.';
  }catch(error){status.className='error';status.textContent=error.message;}
- finally{submit.disabled=false;}
+ finally{submit.disabled=false;collection.disabled=false;}
 });
 </script></body></html>

@@ -36,18 +36,18 @@ flowchart LR
     D[Saved documents] --> C[Chunks with source metadata]
     C --> E[MiniLM embeddings]
     E --> I[Saved FAISS index]
-    Q[Question] --> R[Retrieve top 3 passages]
+    Q[Question] --> R[Hybrid retrieval: top 3 passages]
     I --> R
-    R --> L[Local Llama structured answer]
+    R --> L[Local Llama + JSON schema]
     Q --> L
     L --> V[Structure and quote checks]
     V --> U[Answer, evidence quotes and source links]
 ```
 
-The current web and terminal defaults use semantic retrieval, the original structured prompt, and JSON mode. Hybrid retrieval and JSON-schema generation are available as evaluation options; this repository reorganization does not change the pipeline's behavior.
+The web and terminal apps use hybrid retrieval (semantic + BM25), the original structured prompt, JSON-schema-constrained generation, and the existing quote validator. The evaluation command retains explicit options for comparing earlier baselines.
 
 - Embeddings: normalized 384-dimensional MiniLM vectors.
-- Search: FAISS `IndexFlatIP`; optional BM25 + reciprocal-rank fusion experiment.
+- Search: FAISS `IndexFlatIP` + BM25, combined with reciprocal-rank fusion.
 - Persistence: corpus/model checks and index checksum; document vectors are reused.
 - Generation: local `llama3.1:8b`; each question is independent.
 - Validation: response structure, source labels, and quoted text with limited whitespace normalization.
@@ -99,3 +99,18 @@ These are inspected development-set results, not a general accuracy benchmark. H
 The saved source collection is [Diabetes Basics](https://www.cdc.gov/diabetes/about/index.html), [Type 2 Diabetes](https://www.cdc.gov/diabetes/about/about-type-2-diabetes.html), and [Symptoms of Diabetes](https://www.cdc.gov/diabetes/signs-symptoms/index.html). Source titles, URLs, sections, dates, and fingerprints are retained. This project is not affiliated with or endorsed by CDC. A source review date is not a download date.
 
 `requirements.txt` lists direct dependencies; `requirements-lock.txt` records the development environment. Environments, credentials, model caches, raw downloads, generated indexes, evaluation reports, and private progress notes are excluded from Git. Rebuild the saved index after changing chunks or embedding settings.
+
+## Larger data exercise
+
+A separate MedQuAD importer and hybrid search command expand the exercise to **500 answer records, 481 source documents, and 1,020 chunks** with source URLs and fingerprints. Questions are kept separately for retrieval checks. The web app offers CDC and MedQuAD when their saved indexes are available. See [data setup, attribution, and measured results](docs/medquad.md).
+
+### Select a collection
+
+Start `python web_assistant.py` and choose CDC or MedQuAD in the document collection menu. Restart an already-running server to load this update. MedQuAD appears only when its prepared corpus and matching saved index load successfully; CDC remains available if MedQuAD is missing.
+
+```bash
+python structured_healthcare.py --collection medquad "What are the symptoms of Adult Acute Myeloid Leukemia?"
+python structured_healthcare.py --collection cdc "What is insulin resistance?"
+```
+
+Both collections use hybrid retrieval, schema-constrained generation, and quote matching. These mechanical checks do not establish factual support.

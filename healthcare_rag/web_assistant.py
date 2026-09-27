@@ -8,8 +8,10 @@ from http.server import BaseHTTPRequestHandler, HTTPServer
 from healthcare_rag.structured_healthcare import (
     CACHE, MODEL_NAME, SentenceTransformer, STRUCTURED_PROMPT,
     build_healthcare_context, generate_answer, load_index, read_corpus,
-    search, validate_response,
+    search, validate_response, response_schema,
 )
+
+from healthcare_rag.collections import COLLECTIONS, load_collection
 
 PAGE = PROJECT / "web" / "index.html"
 
@@ -18,12 +20,13 @@ def ask(model, index, passages, question):
     """Return validated output with evidence; never expose rejected claims."""
     results = search(model, index, passages, question, limit=3)
     raw = generate_answer(question, build_healthcare_context(results),
-                          system_prompt=STRUCTURED_PROMPT, response_format="json")
+                          system_prompt=STRUCTURED_PROMPT, response_format=response_schema(len(results)))
     response = validate_response(raw, results)
     return {"response": response, "sources": results}
 
 
-def make_handler(model, index, passages):
+def make_handler(model, index, passages, collections=None):
+    collections = collections if collections is not None else {"cdc": (index, passages)}
     class Handler(BaseHTTPRequestHandler):
         def send(self, status, body, content_type="application/json"):
             self.send_response(status)
@@ -35,6 +38,10 @@ def make_handler(model, index, passages):
             self.wfile.write(body)
 
         def do_GET(self):
+            if self.path == "/collections":
+                self.send(200, json.dumps([{"id": name, "label": COLLECTIONS[name][0], "chunks": len(value[1])}
+                                           for name, value in collections.items()]).encode())
+                return
             if self.path != "/":
                 self.send(404, b'{"error":"Not found"}')
                 return
@@ -58,11 +65,16 @@ def make_handler(model, index, passages):
                 question = data.get("question") if isinstance(data, dict) else None
                 if not isinstance(question, str) or not question.strip() or len(question) > 2000:
                     raise ValueError("Enter a question of 1–2000 characters.")
+                collection = data.get("collection", "cdc")
+                if not isinstance(collection, str) or collection not in collections:
+                    raise ValueError("Select an available collection.")
             except (ValueError, UnicodeError) as error:
                 self.send(400, json.dumps({"error": str(error)}).encode())
                 return
             try:
-                result = ask(model, index, passages, question.strip())
+                selected_index, selected_passages = collections[collection]
+                result = ask(model, selected_index, selected_passages, question.strip())
+                result["collection"] = collection
             except ValueError:
                 self.send(422, json.dumps({"error": "The response failed evidence validation and was withheld. Try rephrasing your question."}).encode())
                 return
@@ -84,7 +96,12 @@ def main():
         print("Loading model and saved index...", flush=True)
         model = SentenceTransformer(MODEL_NAME, cache_folder=str(CACHE), device="cpu")
         index = load_index(model, passages, corpus_hash)
-        server = HTTPServer(("127.0.0.1", args.port), make_handler(model, index, passages))
+        collections = {"cdc": (index, passages)}
+        try:
+            collections["medquad"] = load_collection(model, "medquad")
+        except (OSError, ValueError, KeyError, RuntimeError) as error:
+            print(f"MedQuAD unavailable; CDC remains available: {error}", flush=True)
+        server = HTTPServer(("127.0.0.1", args.port), make_handler(model, index, passages, collections))
     except (OSError, ValueError, KeyError, RuntimeError) as error:
         parser.error(str(error))
     print(f"Open http://127.0.0.1:{server.server_port} — Ctrl-C to stop.", flush=True)

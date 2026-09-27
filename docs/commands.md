@@ -1,6 +1,6 @@
 # Commands and folder guide
 
-Run these from the repository root with the virtual environment activated. The app behavior and data snapshots have not changed during reorganization.
+Run these from the repository root with the virtual environment activated. The data snapshots are unchanged. The web and structured terminal apps now use hybrid retrieval and JSON schema; evaluation defaults remain available for baseline comparisons.
 
 ## Main application (unchanged commands)
 
@@ -66,3 +66,23 @@ python -m healthcare_rag.healthcare_assistant "What is insulin resistance?"
 ```
 
 Shared early components remain in the main package because current code imports their search, tokenization, context-building, or Ollama functions. They are not duplicate copies of the root launchers.
+
+## MedQuAD data expansion
+
+See [MedQuAD setup](medquad.md) to prepare the separate dataset and index. After preparation:
+
+```bash
+python -m healthcare_rag.medquad_search "What are the symptoms of Adult Acute Myeloid Leukemia?"
+python -m healthcare_rag.medquad_search --benchmark
+```
+
+### Select a collection
+
+Start `python web_assistant.py` and choose CDC or MedQuAD in the document collection menu. Restart an already-running server to load this update. MedQuAD appears only when its prepared corpus and matching saved index load successfully; CDC remains available if MedQuAD is missing.
+
+```bash
+python structured_healthcare.py --collection medquad "What are the symptoms of Adult Acute Myeloid Leukemia?"
+python structured_healthcare.py --collection cdc "What is insulin resistance?"
+```
+
+Both collections use hybrid retrieval, schema-constrained generation, and quote matching. These mechanical checks do not establish factual support.

@@ -7,6 +7,7 @@ from contextlib import redirect_stdout, redirect_stderr
 from unittest.mock import MagicMock, patch
 
 import healthcare_rag.structured_healthcare as app
+from healthcare_rag.paths import PROJECT
 
 
 class TestStructuredPersistence(unittest.TestCase):
@@ -27,7 +28,7 @@ class TestStructuredPersistence(unittest.TestCase):
                 patch("healthcare_rag.semantic_search.build_index", side_effect=AssertionError("Must not rebuild")), \
                 redirect_stdout(io.StringIO()) as output:
             app.main()
-        load.assert_called_once_with(model, [passage], "hash")
+        load.assert_called_once_with(model, [passage], "hash", folder=PROJECT / "data/index")
         generate.assert_called_once()
         model.encode.assert_not_called()
         self.assertIn("Document embeddings were not rebuilt", output.getvalue())

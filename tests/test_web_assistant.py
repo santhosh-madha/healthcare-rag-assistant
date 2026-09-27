@@ -16,7 +16,7 @@ class TestWebAssistant(unittest.TestCase):
         self.assertEqual(result["sources"], self.sources)
         self.assertEqual(result["response"]["status"], "answered")
         self.assertEqual(generate.call_args.kwargs["system_prompt"], app.STRUCTURED_PROMPT)
-        self.assertEqual(generate.call_args.kwargs["response_format"], "json")
+        self.assertEqual(generate.call_args.kwargs["response_format"], app.response_schema(len(self.sources)))
 
     def test_invalid_quote_is_withheld(self):
         raw = '{"status":"answered","claims":[{"text":"Made up.","source":"S1","quote":"Invented evidence."}]}'

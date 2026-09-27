@@ -10,3 +10,9 @@ data/raw/
 evaluation_runs/
 /PROGRESS_NOTES.md
 data/index/
+
+# Generated MedQuAD snapshots (recreate with importer)
+data/processed/medquad/
+
+# Local data inspection notebook
+/notebooks/01_inspect_medquad.ipynb
